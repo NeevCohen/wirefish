@@ -32,3 +32,6 @@
 *.app
 
 *.dSYM
+
+# The executable
+wirefish
