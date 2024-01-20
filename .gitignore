@@ -35,3 +35,6 @@
 
 # The executable
 wirefish
+
+# Cache
+.cache/
