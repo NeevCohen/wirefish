@@ -5,7 +5,7 @@ int main() {
 	SnifferOptions opts {.interface_name = "en0"};
 	Sniffer sniffer(opts);
 	sniffer.attach_bpf();
-	for (int i = 0; i < 3; ++i) {
+	while (true) {
 		Packet packet = sniffer.read_next_packet();
 		struct ether_header *ethernet_header = (struct ether_header *)packet.data.get();
 		std::printf("Ethernet source host %x:%x:%x:%x:%x:%x\n", 
