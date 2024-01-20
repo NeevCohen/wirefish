@@ -1,0 +1,24 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++17",
+      "-c",
+      "sniffer.cpp"
+    ],
+    "directory": "/Users/neevcohen/work/wirefish/libsniff",
+    "file": "/Users/neevcohen/work/wirefish/libsniff/sniffer.cpp"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-Wall",
+      "-std=c++17",
+      "-I../libsniff",
+      "-c",
+      "main.cpp"
+    ],
+    "directory": "/Users/neevcohen/work/wirefish/cli",
+    "file": "/Users/neevcohen/work/wirefish/cli/main.cpp"
+  }
+]
