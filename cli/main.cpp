@@ -1,29 +1,29 @@
+#include <cstdlib>
 #include <iostream>
+#include <memory>
+#include <arpa/inet.h>
+#include <stdexcept>
+#include <unistd.h>
 #include "sniffer.h"
 
 int main() { 
+	if (getuid()) {
+		std::cerr << "Please run as root user\n";
+		exit(EXIT_FAILURE);
+	}
+
 	SnifferOptions opts {.interface_name = "en0"};
 	Sniffer sniffer(opts);
 	sniffer.attach_bpf();
 	while (true) {
-		Packet packet = sniffer.read_next_packet();
-		struct ether_header *ethernet_header = (struct ether_header *)packet.data.get();
-		std::printf("Ethernet source host %x:%x:%x:%x:%x:%x\n", 
-					 ethernet_header->ether_shost[0], 
-					 ethernet_header->ether_shost[1], 
-					 ethernet_header->ether_shost[2], 
-					 ethernet_header->ether_shost[3], 
-					 ethernet_header->ether_shost[4], 
-					 ethernet_header->ether_shost[5]
-		);
-		std::printf("Ethernet destination host %x:%x:%x:%x:%x:%x\n", 
-					 ethernet_header->ether_dhost[0], 
-					 ethernet_header->ether_dhost[1], 
-					 ethernet_header->ether_dhost[2], 
-					 ethernet_header->ether_dhost[3], 
-					 ethernet_header->ether_dhost[4], 
-					 ethernet_header->ether_dhost[5]
-		);
+		IPPacket packet = sniffer.read_next_ip_packet();
+		std::cout << "================\n";
+		char s[INET_ADDRSTRLEN] = {0};
+		char d[INET_ADDRSTRLEN] = {0};
+		inet_ntop(AF_INET, &(packet.header->ip_src.s_addr), s, INET_ADDRSTRLEN);
+		inet_ntop(AF_INET, &(packet.header->ip_dst.s_addr), d, INET_ADDRSTRLEN);
+		std::printf("IP source host: %s\n", s);
+		std::printf("IP destination host: %s\n", d);
 	}
 	return 0;
 }
