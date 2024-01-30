@@ -1,7 +1,8 @@
 #include <memory>
 #include <string>
-#include <netinet/if_ether.h>
-#include <netinet/ip.h>
+#include <mutex>
+
+#include "capture.h"
 
 #pragma once
 
@@ -9,20 +10,6 @@ struct SnifferOptions {
 	std::string bpf_device;
 	std::string interface_name;
 	u_int buffer_length;
-};
-
-struct Packet {
-	std::unique_ptr<char[]> data;
-};
-
-struct EthernetFrame {
-	ether_header_t *header;
-	char *data;
-};
-
-struct IPPacket {
-	struct ip *header;
-	char *data;
 };
 
 struct Sniffer {
@@ -33,15 +20,17 @@ private:
 	std::unique_ptr<char[]> read_buffer;
 	size_t last_read_length;
 	size_t read_bytes_consumed;
+	std::mutex read_lock;
 
 private:
 	static int get_available_bpf_device();
+	void fill_buffer(int t);
 
 public:
 	Sniffer(SnifferOptions options);
-	Packet read_next_packet();
-	EthernetFrame read_next_ethernet_frame();
-	IPPacket read_next_ip_packet();
+	Capture read_next_capture(int t);
+	EthernetFrame read_next_ethernet_frame(int t);
+	IPPacket read_next_ip_packet(int t);
 	void attach_bpf();
 	~Sniffer();
 };

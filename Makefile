@@ -7,8 +7,8 @@ CXX := clang++
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -g
 CXXFLAGS_DYLIB := $(CXXFLAGS) -shared
 LIBSNIFF_DIR := $(PROJ_DIR)/libsniff
-LIBSNIFF_SOURCES := $(LIBSNIFF_DIR)/sniffer.cpp
-LIBSNIFF_HEADERS := $(LIBSNIFF_DIR)/sniffer.h
+LIBSNIFF_SOURCES := $(LIBSNIFF_DIR)/sniffer.cpp $(LIBSNIFF_DIR)/capture.cpp
+LIBSNIFF_HEADERS := $(LIBSNIFF_DIR)/sniffer.h $(LIBSNIFF_DIR)/capture.h
 CLI_DIR := $(PROJ_DIR)/cli
 CLI_SOURCES := $(CLI_DIR)/main.cpp
 BUILD_DIR := $(PROJ_DIR)/build
