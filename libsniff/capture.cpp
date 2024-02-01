@@ -1,5 +1,7 @@
 #include "capture.h"
 
+#include <arpa/inet.h>
+
 Capture::Capture(std::vector<char> buffer): internal_buffer(std::move(buffer)), data(internal_buffer.data()){};
 
 Capture::Capture(size_t buffer_size) {
@@ -31,20 +33,34 @@ EthernetFrame::EthernetFrame(Capture &capture): Capture(std::move(capture)) {
 	ethernet_data = (char*)ethernet_header + sizeof(ether_header_t);
 };
 
-IPPacket::IPPacket(std::vector<char> buffer): EthernetFrame(std::move(buffer)){
-	ip_header = (struct ip *)ethernet_data;
-	ip_data = (char*)ip_header + ip_header->ip_hl;
-};
-
 IPPacket::IPPacket(size_t buffer_size)
     : EthernetFrame(buffer_size), ip_header(nullptr), ip_data(nullptr){};
 
-IPPacket::IPPacket(EthernetFrame &frame): EthernetFrame(std::move(frame)){
+IPPacket::IPPacket(std::vector<char> buffer): EthernetFrame(std::move(buffer)){
 	ip_header = (struct ip *)ethernet_data;
 	ip_data = (char*)ip_header + ip_header->ip_hl;
+	char src_addr_str[INET_ADDRSTRLEN];
+	char dst_addr_str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(ip_header->ip_src.s_addr), src_addr_str, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &(ip_header->ip_dst.s_addr), dst_addr_str, INET_ADDRSTRLEN);
+	src_ip_str = std::string(src_addr_str);
+	dst_ip_str = std::string(dst_addr_str);
+};
+
+IPPacket::IPPacket(EthernetFrame &frame): EthernetFrame(std::move(frame)) {
+	ip_header = (struct ip *)ethernet_data;
+	ip_data = (char*)ip_header + ip_header->ip_hl;
+	char src_addr_str[INET_ADDRSTRLEN];
+	char dst_addr_str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(ip_header->ip_src.s_addr), src_addr_str, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &(ip_header->ip_dst.s_addr), dst_addr_str, INET_ADDRSTRLEN);
+	src_ip_str = std::string(src_addr_str);
+	dst_ip_str = std::string(dst_addr_str);
 };
 
 IPPacket::IPPacket(IPPacket &&other): EthernetFrame(std::move(other.internal_buffer)) {
 	ip_header = (struct ip *)ethernet_data;
 	ip_data = (char*)ip_header + ip_header->ip_hl;
+	src_ip_str = other.src_ip_str;
+	dst_ip_str = other.dst_ip_str;
 };

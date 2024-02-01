@@ -16,11 +16,7 @@ void print_ip(Sniffer &sniffer)
 		IPPacket pac = sniffer.read_next_ip_packet();
 		
 		std::cout << "================\n";
-		char s[INET_ADDRSTRLEN];
-		char d[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &(pac.ip_header->ip_src.s_addr), s, INET_ADDRSTRLEN);
-		inet_ntop(AF_INET, &(pac.ip_header->ip_dst.s_addr), d, INET_ADDRSTRLEN);
-		std::printf("%s -> %s\n", s, d);
+		std::cout << pac.src_ip_str << " -> " << pac.dst_ip_str << "\n";
 	}
 }
 

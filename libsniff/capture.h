@@ -1,5 +1,6 @@
 #include <memory>
 #include <vector>
+#include <string>
 
 #include <netinet/if_ether.h>
 #include <netinet/ip.h>
@@ -34,6 +35,8 @@ struct IPPacket: public EthernetFrame {
 public:
 	const struct ip *ip_header;
 	const char *ip_data;
+	std::string src_ip_str;
+	std::string dst_ip_str;
 	IPPacket(std::vector<char> buffer);
 	IPPacket(size_t buffer_size);
 	IPPacket(EthernetFrame &frame);
