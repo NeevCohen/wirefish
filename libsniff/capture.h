@@ -1,4 +1,6 @@
 #include <memory>
+#include <vector>
+
 #include <netinet/if_ether.h>
 #include <netinet/ip.h>
 
@@ -6,14 +8,13 @@
 
 struct Capture {
 protected:
-	std::unique_ptr<char[]> internal_buffer;
+	std::vector<char> internal_buffer;
 
 public:
 	const char *data;
-	size_t buffer_size;
 
 public:
-	Capture(std::unique_ptr<char[]> buffer, size_t buffer_size);
+	Capture(std::vector<char> buffer);
 	Capture(size_t buffer_size);
 	Capture(Capture &&other);
 	~Capture();
@@ -21,9 +22,9 @@ public:
 
 struct EthernetFrame: public Capture {
 public:
-	const ether_header_t *const ethernet_header;
-	const char *const ethernet_data;
-	EthernetFrame(std::unique_ptr<char[]> buffer, size_t buffer_size);
+	const ether_header_t *ethernet_header;
+	const char *ethernet_data;
+	EthernetFrame(std::vector<char> buffer);
 	EthernetFrame(size_t buffer_size);
 	EthernetFrame(Capture &capture);
 	EthernetFrame(EthernetFrame &&other);
@@ -31,9 +32,9 @@ public:
 
 struct IPPacket: public EthernetFrame {
 public:
-	struct ip *ip_header;
-	char *ip_data;
-	IPPacket(std::unique_ptr<char[]> buffer, size_t buffer_size);
+	const struct ip *ip_header;
+	const char *ip_data;
+	IPPacket(std::vector<char> buffer);
 	IPPacket(size_t buffer_size);
 	IPPacket(EthernetFrame &frame);
 	IPPacket(IPPacket &&other);

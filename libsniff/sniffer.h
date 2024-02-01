@@ -24,13 +24,13 @@ private:
 
 private:
 	static int get_available_bpf_device();
-	void fill_buffer(int t);
+	void fill_buffer();
 
 public:
 	Sniffer(SnifferOptions options);
-	Capture read_next_capture(int t);
-	EthernetFrame read_next_ethernet_frame(int t);
-	IPPacket read_next_ip_packet(int t);
+	Capture read_next_capture();
+	EthernetFrame read_next_ethernet_frame();
+	IPPacket read_next_ip_packet();
 	void attach_bpf();
 	~Sniffer();
 };
