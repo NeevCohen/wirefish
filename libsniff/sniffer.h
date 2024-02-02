@@ -31,6 +31,7 @@ public:
 	Capture read_next_capture();
 	EthernetFrame read_next_ethernet_frame();
 	IPPacket read_next_ip_packet();
+	TCPFrame read_next_tcp_frame();
 	void attach_bpf();
 	~Sniffer();
 };

@@ -1,6 +1,7 @@
 #include "capture.h"
 
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 
 Capture::Capture(std::vector<char> buffer): internal_buffer(std::move(buffer)), data(internal_buffer.data()){};
 
@@ -38,7 +39,7 @@ IPPacket::IPPacket(size_t buffer_size)
 
 IPPacket::IPPacket(std::vector<char> buffer): EthernetFrame(std::move(buffer)){
 	ip_header = (struct ip *)ethernet_data;
-	ip_data = (char*)ip_header + ip_header->ip_hl;
+	ip_data = (char*)ip_header + (ip_header->ip_hl * 4); // ip_hl specifies the length of the header in 32 bit words
 	char src_addr_str[INET_ADDRSTRLEN];
 	char dst_addr_str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(ip_header->ip_src.s_addr), src_addr_str, INET_ADDRSTRLEN);
@@ -49,7 +50,7 @@ IPPacket::IPPacket(std::vector<char> buffer): EthernetFrame(std::move(buffer)){
 
 IPPacket::IPPacket(EthernetFrame &frame): EthernetFrame(std::move(frame)) {
 	ip_header = (struct ip *)ethernet_data;
-	ip_data = (char*)ip_header + ip_header->ip_hl;
+	ip_data = (char*)ip_header + (ip_header->ip_hl * 4); // ip_hl specifies the length of the header in 32 bit words
 	char src_addr_str[INET_ADDRSTRLEN];
 	char dst_addr_str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(ip_header->ip_src.s_addr), src_addr_str, INET_ADDRSTRLEN);
@@ -60,7 +61,28 @@ IPPacket::IPPacket(EthernetFrame &frame): EthernetFrame(std::move(frame)) {
 
 IPPacket::IPPacket(IPPacket &&other): EthernetFrame(std::move(other.internal_buffer)) {
 	ip_header = (struct ip *)ethernet_data;
-	ip_data = (char*)ip_header + ip_header->ip_hl;
+	ip_data = (char*)ip_header + (ip_header->ip_hl * 4); // ip_hl specifies the length of the header in 32 bit words
 	src_ip_str = other.src_ip_str;
 	dst_ip_str = other.dst_ip_str;
 };
+
+TCPFrame::TCPFrame(std::vector<char> buffer): IPPacket(buffer) {
+	tcp_header = (struct tcphdr*)ip_data;
+	payload = (char*)tcp_header + tcp_header->th_off;
+}
+
+TCPFrame::TCPFrame(size_t buffer_size): IPPacket(buffer_size), tcp_header(nullptr), payload(nullptr){}
+
+TCPFrame::TCPFrame(IPPacket &packet): IPPacket(std::move(packet)) {
+	tcp_header = (struct tcphdr*)ip_data;
+	tcp_sport = ntohs(tcp_header->th_sport);
+	tcp_dport = ntohs(tcp_header->th_dport);
+	payload = (char*)tcp_header + tcp_header->th_off;
+}
+
+TCPFrame::TCPFrame(TCPFrame &&other): IPPacket(std::move(other.internal_buffer)) {
+	tcp_header = (struct tcphdr*)ip_data;
+	tcp_sport = other.tcp_sport;
+	tcp_dport = other.tcp_dport;
+	payload = (char*)tcp_header + tcp_header->th_off;
+}

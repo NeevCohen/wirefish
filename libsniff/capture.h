@@ -4,6 +4,7 @@
 
 #include <netinet/if_ether.h>
 #include <netinet/ip.h>
+#include <netinet/tcp.h>
 
 #pragma once
 
@@ -43,3 +44,14 @@ public:
 	IPPacket(IPPacket &&other);
 };
 
+struct TCPFrame: public IPPacket {
+	public:
+	const struct tcphdr *tcp_header;
+	const char *payload;
+	u_short tcp_sport;
+	u_short tcp_dport;
+	TCPFrame(std::vector<char> buffer);
+	TCPFrame(size_t buffer_size);
+	TCPFrame(IPPacket &packet);
+	TCPFrame(TCPFrame &&other);
+};

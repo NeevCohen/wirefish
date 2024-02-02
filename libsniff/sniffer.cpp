@@ -124,12 +124,20 @@ EthernetFrame Sniffer::read_next_ethernet_frame() {
 }
 
 IPPacket Sniffer::read_next_ip_packet() {
-  struct ip *ip_header;
   do {
     EthernetFrame frame = read_next_ethernet_frame();
-    ip_header = (struct ip *)frame.ethernet_data;
-    if (ip_header->ip_v == 4) {
+    if (ntohs(frame.ethernet_header->ether_type) == ETHERTYPE_IP) {
       return IPPacket(frame);
+    }
+  } while (true);
+}
+
+
+TCPFrame Sniffer::read_next_tcp_frame() {
+  do {
+    IPPacket packet = read_next_ip_packet();
+    if (packet.ip_header->ip_p == IPPROTO_TCP) {
+      return TCPFrame(packet);
     }
   } while (true);
 }
