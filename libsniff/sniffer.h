@@ -13,7 +13,6 @@ struct SnifferOptions {
 };
 
 struct Sniffer {
-
 private:
   SnifferOptions options;
   int bpf_fd;
