@@ -13,31 +13,16 @@
 void print_ip(Sniffer &sniffer)
 {
 	for (int i = 0; i < 10; i++) {
-		TCPFrame frame = sniffer.read_next_tcp_frame();
-		
-		if (frame.src_ip_str != "1.1.1.1" && frame.dst_ip_str != "1.1.1.1") {
+		UDPDatagram dgram = sniffer.read_next_udp_datagram();
+		/*
+		if (dgram.udp_dport != 8000) {
+			i--;
 			continue;
 		}
-
+		*/
 		std::cout << "================\n";
-		std::cout << frame.src_ip_str << " -> " << frame.dst_ip_str << "\n";
-		std::printf("%hu -> %hu\n", frame.tcp_sport, frame.tcp_dport);
-		if (frame.tcp_header->th_flags & TH_SYN) {
-			std::cout << "SYN ";
-		}
-		if (frame.tcp_header->th_flags & TH_FIN) {
-			std::cout << "FIN ";
-		}
-		if (frame.tcp_header->th_flags & TH_ACK) {
-			std::cout << "ACK ";
-		}
-		if (frame.tcp_header->th_flags & TH_PUSH) {
-			std::cout << "PUSH ";
-		}
-		if (frame.tcp_header->th_flags & TH_RST) {
-			std::cout << "RESET ";
-		}
-		std::cout << "\n";
+		std::printf("%s -> %s\n", dgram.src_ip_str.c_str(), dgram.dst_ip_str.c_str());
+		std::printf("%hu -> %hu\n", dgram.udp_sport, dgram.udp_dport);
 	}
 }
 

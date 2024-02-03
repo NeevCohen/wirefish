@@ -111,10 +111,10 @@ Capture Sniffer::read_next_capture() {
 	char *bpf_capture = (char *)bpf_header + bpf_header->bh_hdrlen;
 	std::vector<char> packet(bpf_header->bh_caplen);
 	std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, packet.begin());
-  Capture capture(packet);
+  Capture capture(std::move(packet));
   read_bytes_consumed +=
       BPF_WORDALIGN(bpf_header->bh_caplen + bpf_header->bh_hdrlen);
-  return packet;
+  return capture;
 };
 
 EthernetFrame Sniffer::read_next_ethernet_frame() {
@@ -141,6 +141,15 @@ TCPFrame Sniffer::read_next_tcp_frame() {
     }
   } while (true);
 }
+
+UDPDatagram Sniffer::read_next_udp_datagram() {
+  do {
+    IPPacket packet = read_next_ip_packet();
+    if (packet.ip_header->ip_p == IPPROTO_UDP) {
+      return UDPDatagram(packet);
+    }
+  } while (true);
+};
 
 Sniffer::~Sniffer() {
   if (bpf_fd > 0) {
