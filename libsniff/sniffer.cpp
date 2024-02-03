@@ -9,8 +9,7 @@
 #include <sys/sysctl.h>
 #include <unistd.h>
 
-Sniffer::Sniffer(SnifferOptions options)
-    : options(options), last_read_length(0), read_bytes_consumed(0) {
+Sniffer::Sniffer(SnifferOptions options): options(options), last_read_length(0), read_bytes_consumed(0) {
 	if (options.buffer_length > 0) {
 		read_buffer = std::make_unique<char[]>(options.buffer_length);
 	} else {
@@ -23,9 +22,7 @@ int Sniffer::get_available_bpf_device() {
   size_t len = sizeof(max_bpf_devices);
   int fd;
 
-  // TODO: Check return value
-  if (sysctlbyname("debug.bpf_maxdevices", &max_bpf_devices, &len, NULL, 0) <
-      0) {
+  if (sysctlbyname("debug.bpf_maxdevices", &max_bpf_devices, &len, NULL, 0) < 0) {
     throw std::runtime_error("Failed to get maximum number of bpf devices");
   }
 
@@ -54,7 +51,6 @@ void Sniffer::attach_bpf() {
   }
 
   if (bpf_fd < 0) {
-    std::printf("uid %d\n", getuid());
     std::perror("open");
     throw std::runtime_error("Failed to open bpf device");
   }
@@ -72,9 +68,9 @@ void Sniffer::attach_bpf() {
     }
   }
 
-	if (read_buffer == nullptr) {
-		read_buffer = std::make_unique<char[]>(options.buffer_length);
-	}
+  if (read_buffer == nullptr) {
+    read_buffer = std::make_unique<char[]>(options.buffer_length);
+  }
 
   if (ioctl(bpf_fd, BIOCSETIF, &interface_request) < 0) {
     std::perror("ioctl(BIOCSETIF)");
@@ -109,11 +105,11 @@ Capture Sniffer::read_next_capture() {
   }
   struct bpf_hdr *bpf_header = (struct bpf_hdr *)(read_buffer.get() + read_bytes_consumed);
 	char *bpf_capture = (char *)bpf_header + bpf_header->bh_hdrlen;
+
 	std::vector<char> packet(bpf_header->bh_caplen);
 	std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, packet.begin());
   Capture capture(std::move(packet));
-  read_bytes_consumed +=
-      BPF_WORDALIGN(bpf_header->bh_caplen + bpf_header->bh_hdrlen);
+  read_bytes_consumed += BPF_WORDALIGN(bpf_header->bh_caplen + bpf_header->bh_hdrlen);
   return capture;
 };
 

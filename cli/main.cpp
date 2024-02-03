@@ -29,14 +29,13 @@ void print_ip(Sniffer &sniffer)
 int main()
 {
   if (getuid()) {
-	std::cerr << "Please run as root user\n";
-	exit(EXIT_FAILURE);
+		std::cerr << "Please run as root user\n";
+		exit(EXIT_FAILURE);
   }
 
 	SnifferOptions opts{.interface_name = "en0"};
 	Sniffer sniffer(opts);
 	sniffer.attach_bpf();
-
 
 	std::thread t1{print_ip, std::ref(sniffer)};
 	//std::thread t2{print_ip, std::ref(sniffer)};
