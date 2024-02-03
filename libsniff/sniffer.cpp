@@ -101,13 +101,13 @@ void Sniffer::fill_buffer() {
 Capture Sniffer::read_next_capture() {
   std::lock_guard<std::mutex> lock_guard(read_lock);
   if (read_bytes_consumed >= last_read_length) {
-		fill_buffer();
+    fill_buffer();
   }
   struct bpf_hdr *bpf_header = (struct bpf_hdr *)(read_buffer.get() + read_bytes_consumed);
-	char *bpf_capture = (char *)bpf_header + bpf_header->bh_hdrlen;
+  char *bpf_capture = (char *)bpf_header + bpf_header->bh_hdrlen;
 
-	std::vector<char> packet(bpf_header->bh_caplen);
-	std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, packet.begin());
+  std::vector<char> packet(bpf_header->bh_caplen);
+  std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, packet.begin());
   Capture capture(std::move(packet));
   read_bytes_consumed += BPF_WORDALIGN(bpf_header->bh_caplen + bpf_header->bh_hdrlen);
   return capture;
