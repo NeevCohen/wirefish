@@ -10,11 +10,11 @@
 #include <unistd.h>
 
 Sniffer::Sniffer(SnifferOptions options): options(options), last_read_length(0), read_bytes_consumed(0) {
-	if (options.buffer_length > 0) {
-		read_buffer = std::make_unique<char[]>(options.buffer_length);
-	} else {
-		read_buffer = nullptr;
-	}
+  if (options.buffer_length > 0) {
+    read_buffer = std::make_unique<char[]>(options.buffer_length);
+  } else {
+    read_buffer = nullptr;
+  }
 };
 
 int Sniffer::get_available_bpf_device() {
