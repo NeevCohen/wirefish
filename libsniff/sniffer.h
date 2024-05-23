@@ -28,12 +28,7 @@ private:
 public:
   Sniffer(SnifferOptions options);
   Capture read_next_capture();
-  EthernetFrame read_next_ethernet_frame();
-  IPPacket read_next_ip_packet();
-  TCPFrame read_next_tcp_frame();
-  UDPDatagram read_next_udp_datagram();
   void attach_bpf();
   ~Sniffer();
 };
-
 

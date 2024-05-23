@@ -106,45 +106,11 @@ Capture Sniffer::read_next_capture() {
   struct bpf_hdr *bpf_header = (struct bpf_hdr *)(read_buffer.get() + read_bytes_consumed);
   char *bpf_capture = (char *)bpf_header + bpf_header->bh_hdrlen;
 
-  std::vector<char> packet(bpf_header->bh_caplen);
-  std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, packet.begin());
-  Capture capture(std::move(packet));
+  std::vector<char> raw_cap(bpf_header->bh_caplen);
+  std::copy(bpf_capture, bpf_capture + bpf_header->bh_caplen, raw_cap.begin());
+  Capture capture(std::move(raw_cap));
   read_bytes_consumed += BPF_WORDALIGN(bpf_header->bh_caplen + bpf_header->bh_hdrlen);
   return capture;
-};
-
-EthernetFrame Sniffer::read_next_ethernet_frame() {
-  Capture capture = read_next_capture();
-  EthernetFrame frame(capture);
-  return frame;
-}
-
-IPPacket Sniffer::read_next_ip_packet() {
-  do {
-    EthernetFrame frame = read_next_ethernet_frame();
-    if (ntohs(frame.ethernet_header->ether_type) == ETHERTYPE_IP) {
-      return IPPacket(frame);
-    }
-  } while (true);
-}
-
-
-TCPFrame Sniffer::read_next_tcp_frame() {
-  do {
-    IPPacket packet = read_next_ip_packet();
-    if (packet.ip_header->ip_p == IPPROTO_TCP) {
-      return TCPFrame(packet);
-    }
-  } while (true);
-}
-
-UDPDatagram Sniffer::read_next_udp_datagram() {
-  do {
-    IPPacket packet = read_next_ip_packet();
-    if (packet.ip_header->ip_p == IPPROTO_UDP) {
-      return UDPDatagram(packet);
-    }
-  } while (true);
 };
 
 Sniffer::~Sniffer() {
