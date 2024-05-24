@@ -6,7 +6,7 @@
 
 struct TCPFrame {
 public:
-  const IPPacket ip;
+  const IPPacket& ip;
   const struct tcphdr *tcp_header;
   u_short tcp_sport;
   u_short tcp_dport;

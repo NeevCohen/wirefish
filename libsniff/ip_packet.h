@@ -7,7 +7,7 @@
 
 struct IPPacket {
 public:
-  const EthernetFrame ethernet;
+  const EthernetFrame& ethernet;
   struct ip *ip_header;
   char *ip_data;
   std::string src_ip_str;

@@ -1,17 +1,37 @@
+#include "capture.h"
 #include "libsniff.h"
+#include "arg_parse.h"
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <thread>
 #include <unistd.h>
 
-void print_ip(Sniffer &sniffer)
+int main(int argc, char **argv)
 {
+  if (getuid()) {
+    std::cerr << "Please run as root user\n";
+    exit(EXIT_FAILURE);
+  }
+
+  SnifferOptions opts {.interface_name = "en0"};
+  Sniffer sniffer(opts);
+  sniffer.attach_bpf();
+
+  try {
+    SniffingOptions sniffing_options = parse_args(argc, argv);
+  } catch (std::invalid_argument& e) {
+    std::cerr << "ERROR: \n\t";
+    std::cerr << e.what() << "\n";
+    return -1;
+  }
+
   int i = 0;
   while (i < 10) {
     Capture cap = sniffer.read_next_capture();
     EthernetFrame ether(cap);
     if (ether.network_protocol == NetworkProtocol::UNKNOWN) {
-      std::cout << "Unknown network protocol - 0x" << ntohs(ether.ethernet_header->ether_type) << "\n";
+      std::cout << "Unknown network protocol - 0x" << std::hex << ntohs(ether.ethernet_header->ether_type) << "\n";
     } else if (ether.network_protocol == NetworkProtocol::ARP) {
       std::cout << "ARP\n";
     } else if (ether.network_protocol == NetworkProtocol::IPv4) {
@@ -24,29 +44,11 @@ void print_ip(Sniffer &sniffer)
         UDPDatagram udp(ip);
         std::printf("UDP - %hu -> %hu\n", udp.udp_sport, udp.udp_dport);
       }
+    } else if (ether.network_protocol == NetworkProtocol::IPv6) {
+      std::cout << "IPv6\n";
     }
     std::cout << "====================\n";
     ++i;
   }
-}
-
-int main()
-{
-  if (getuid()) {
-    std::cerr << "Please run as root user\n";
-    exit(EXIT_FAILURE);
-  }
-
-  std::cout << "Sniffing...\n";
-
-  SnifferOptions opts {.interface_name = "en0"};
-  Sniffer sniffer(opts);
-  sniffer.attach_bpf();
-
-  std::thread t1{print_ip, std::ref(sniffer)};
-  std::thread t2{print_ip, std::ref(sniffer)};
-  t1.join();
-  t2.join();
-
   return 0;
 }

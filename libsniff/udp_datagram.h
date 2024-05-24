@@ -4,7 +4,7 @@
 
 struct UDPDatagram {
 public:
-  const IPPacket ip;
+  const IPPacket& ip;
   u_short udp_sport;
   u_short udp_dport;
   u_short udp_length;

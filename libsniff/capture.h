@@ -19,7 +19,7 @@ enum class TransportProtocol {
 
 struct Capture {
 public:
-  const std::vector<char> buffer;
+  std::vector<char> buffer;
 
 public:
   Capture(std::vector<char> &&buffer);
