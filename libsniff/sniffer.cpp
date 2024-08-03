@@ -74,7 +74,7 @@ void Sniffer::attach_bpf() {
 
   if (ioctl(bpf_fd, BIOCSETIF, &interface_request) < 0) {
     std::perror("ioctl(BIOCSETIF)");
-    throw std::runtime_error("Failed to attatch bpf to interface");
+    throw std::runtime_error("Failed to attach bpf to interface '" + options.interface_name + "'");
   }
 
   if (ioctl(bpf_fd, BIOCIMMEDIATE, &immediate_mode) < 0) {
