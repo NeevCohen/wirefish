@@ -1,5 +1,3 @@
-#include "sniffer.h"
-
 #include <fcntl.h>
 #include <memory>
 #include <net/bpf.h>
@@ -8,6 +6,9 @@
 #include <sys/ioctl.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
+
+#include "sniffer.h"
+
 
 Sniffer::Sniffer(SnifferOptions options): options(options), last_read_length(0), read_bytes_consumed(0) {
   if (options.buffer_length > 0) {

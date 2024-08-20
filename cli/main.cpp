@@ -1,18 +1,22 @@
-#include "capture.h"
-#include "ip_packet.h"
-#include "libsniff.h"
-#include "arg_parse.h"
-#include "tcp_frame.h"
-#include "udp_datagram.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <netinet/in.h>
 #include <stdexcept>
 #include <thread>
 #include <unistd.h>
 
+#include "arpa/inet.h"
+#include "arp_packet.h"
+#include "ethernet_frame.h"
+#include "ip_packet.h"
+#include "libsniff.h"
+#include "arg_parse.h"
+#include "sniffing_options.h"
+
 void print_tcp(const TCPFrame& tcp);
 void print_udp(const UDPDatagram& udp);
+void print_arp(const ARPPacket& arp);
 
 int main(int argc, char **argv)
 {
@@ -46,7 +50,7 @@ int main(int argc, char **argv)
       if (ether.network_protocol == NetworkProtocol::UNKNOWN) {
         std::cout << "Unknown network protocol - 0x" << std::hex << ntohs(ether.ethernet_header->ether_type) << "\n";
       } else if (ether.network_protocol == NetworkProtocol::ARP) {
-        std::cout << "ARP\n";
+        print_arp(ARPPacket(ether));
       } else if (ether.network_protocol == NetworkProtocol::IPv4) {
         IPPacket ip(ether);
         if (ip.transport_protocol == TransportProtocol::TCP) {
@@ -63,7 +67,7 @@ int main(int argc, char **argv)
       } 
     }
     return 0;
-  } catch (std::runtime_error& e) {
+  } catch (const std::runtime_error& e) {
     std::cerr << "RUNTIME ERROR: \n\t";
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
@@ -76,14 +80,25 @@ int main(int argc, char **argv)
 
 void print_tcp(const TCPFrame& tcp) {
   std::printf("%s:%hu -> %s:%hu (TCP)\n", tcp.ip.src_ip_str.c_str(),
-                                    tcp.tcp_sport,
-                                    tcp.ip.dst_ip_str.c_str(),
-                                    tcp.tcp_dport);
+                                          tcp.tcp_sport,
+                                          tcp.ip.dst_ip_str.c_str(),
+                                          tcp.tcp_dport);
 }
 
 void print_udp(const UDPDatagram& udp) {
   std::printf("%s:%hu -> %s:%hu (UDP)\n", udp.ip.src_ip_str.c_str(),
-                                    udp.udp_sport,
-                                    udp.ip.dst_ip_str.c_str(),
-                                    udp.udp_dport);
+                                          udp.udp_sport,
+                                          udp.ip.dst_ip_str.c_str(),
+                                          udp.udp_dport);
 }
+
+void print_arp(const ARPPacket& arp) {
+  if (arp.operation == ArpOperation::Request) {
+    std::cout << "Who has " << parse_ip_address(arp.target_protocol_address) << "? Tell " << parse_ip_address(arp.sender_protocol_address) << " (ARP Request)" << std::endl;
+  } else if(arp.operation == ArpOperation::Reply) {
+    std::cout << parse_ip_address(arp.sender_protocol_address) << " is at " << parse_mac_address(arp.sender_hardware_address) << " (ARP Reply)" << std::endl;
+  } else {
+    std::cout << "Unsupported ARP operation";
+  }
+}
+

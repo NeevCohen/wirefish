@@ -4,6 +4,9 @@
 
 #pragma once
 
+constexpr size_t mac_address_length = 6;
+std::string parse_mac_address(const std::vector<uint8_t>& mac); // mac should be in network order
+
 struct EthernetFrame {
 public:
   const Capture& capture;

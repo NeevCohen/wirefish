@@ -48,6 +48,10 @@ SniffingOptions parse_args(int argc, char *const *argv) {
     }
   }
 
+  if (interface_name.empty()) {
+    throw std::invalid_argument("Must supply interface name");
+  }
+
   return SniffingOptions (std::move(interface_name),
                           count, 
                           std::move(network_protos),

@@ -2,6 +2,8 @@
 #include "libsniff.h"
 #include <vector>
 
+#pragma once
+
 struct SniffingOptions {
 public:
   std::string interface_name;
