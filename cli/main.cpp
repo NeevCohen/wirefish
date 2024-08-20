@@ -6,10 +6,6 @@
 #include <thread>
 #include <unistd.h>
 
-#include "arpa/inet.h"
-#include "arp_packet.h"
-#include "ethernet_frame.h"
-#include "ip_packet.h"
 #include "libsniff.h"
 #include "arg_parse.h"
 #include "sniffing_options.h"
