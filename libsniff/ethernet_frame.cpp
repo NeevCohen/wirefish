@@ -23,7 +23,7 @@ EthernetFrame::EthernetFrame(Capture& capture): capture(capture) {
 
 std::string parse_mac_address(const std::vector<uint8_t>& mac) {
   if (mac.size() < mac_address_length) {
-    throw std::runtime_error("Invalid mac address length " + std::to_string(mac.size()));
+    throw std::runtime_error("Invalid MAC address length " + std::to_string(mac.size()));
   }
 
   std::stringstream stream;
