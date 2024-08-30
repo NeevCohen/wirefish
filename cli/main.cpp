@@ -6,6 +6,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "capture.h"
 #include "libsniff.h"
 #include "arg_parse.h"
 #include "sniffing_options.h"
@@ -47,15 +48,13 @@ int main(int argc, char **argv)
         std::cout << "Unknown network protocol - 0x" << std::hex << ntohs(ether.ethernet_header->ether_type) << "\n";
       } else if (ether.network_protocol == NetworkProtocol::ARP) {
         print_arp(ARPPacket(ether));
-      } else if (ether.network_protocol == NetworkProtocol::IPv4) {
+      } else if (ether.network_protocol == NetworkProtocol::IPv4 || ether.network_protocol == NetworkProtocol::IPv6) {
         IPPacket ip(ether);
         if (ip.transport_protocol == TransportProtocol::TCP) {
           print_tcp(TCPFrame(ip));
         } else if (ip.transport_protocol == TransportProtocol::UDP) {
           print_udp(UDPDatagram(ip));
         }
-      } else if (ether.network_protocol == NetworkProtocol::IPv6) {
-        std::cout << "IPv6\n";
       }
       std::cout << "====================\n";
       if (sniffing_options.packet_count != 0) {
@@ -76,16 +75,16 @@ int main(int argc, char **argv)
 
 void print_tcp(const TCPFrame& tcp) {
   std::printf("%s:%hu -> %s:%hu (TCP)\n", tcp.ip.src_ip_str.c_str(),
-                                          tcp.tcp_sport,
+                                          tcp.source_port,
                                           tcp.ip.dst_ip_str.c_str(),
-                                          tcp.tcp_dport);
+                                          tcp.dest_port);
 }
 
 void print_udp(const UDPDatagram& udp) {
   std::printf("%s:%hu -> %s:%hu (UDP)\n", udp.ip.src_ip_str.c_str(),
-                                          udp.udp_sport,
+                                          udp.source_port,
                                           udp.ip.dst_ip_str.c_str(),
-                                          udp.udp_dport);
+                                          udp.dest_port);
 }
 
 void print_arp(const ARPPacket& arp) {

@@ -8,8 +8,8 @@ struct TCPFrame {
 public:
   const IPPacket& ip;
   const struct tcphdr *tcp_header;
-  u_short tcp_sport;
-  u_short tcp_dport;
+  u_short source_port;
+  u_short dest_port;
   const char *tcp_payload;
 
 public:

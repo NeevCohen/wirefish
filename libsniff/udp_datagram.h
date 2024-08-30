@@ -5,9 +5,9 @@
 struct UDPDatagram {
 public:
   const IPPacket& ip;
-  u_short udp_sport;
-  u_short udp_dport;
-  u_short udp_length;
+  u_short source_port;
+  u_short dest_port;
+  u_short length;
   const char *udp_payload;
 
 public:
