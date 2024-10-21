@@ -12,7 +12,6 @@ MainWindow::MainWindow() : ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
-    menuBar()->setNativeMenuBar(false);
     create_actions();
 }
 
