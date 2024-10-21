@@ -11,7 +11,6 @@
       "cStandard": "c17",
       "cppStandard": "c++17",
       "intelliSenseMode": "macos-clang-arm64",
-      "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json",
       "configurationProvider": "ms-vscode.cmake-tools"
     }
   ],

@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QWidget>
+#include "sniffer.h"
 
 class MainWindow : public QMainWindow
 {
