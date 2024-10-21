@@ -4,6 +4,8 @@
     "qmainwindow": "cpp",
     "qpushbutton": "cpp",
     "qlabel": "cpp",
-    "qwidget": "cpp"
+    "qwidget": "cpp",
+    "qhboxlayout": "cpp",
+    "string": "cpp"
   }
 }
