@@ -1,3 +1,9 @@
 {
-  "cmake.sourceDirectory": "/Users/neevcohen/Projects/wirefish"
+  "cmake.sourceDirectory": "/Users/neevcohen/Projects/wirefish",
+  "files.associations": {
+    "qmainwindow": "cpp",
+    "qpushbutton": "cpp",
+    "qlabel": "cpp",
+    "qwidget": "cpp"
+  }
 }
