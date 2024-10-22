@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include <QMainWindow>
 #include <QWidget>
 #include <QHBoxLayout>
@@ -12,11 +14,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     MainWindow();
-    void create_actions();
+    void populate_interface_selector();
 
 private:
-    QWidget *m_window;
-    QAction *m_action;
+    void start_capture_pressed();
+    void stop_capture_pressed();
+    void start_capturing();
 
+private:
+    std::chrono::steady_clock sc;
+    std::chrono::steady_clock::time_point recording_start;
+
+private:
     Ui::MainWindow *ui;
 };
