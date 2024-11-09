@@ -12,6 +12,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 set(CMAKE_AUTOUIC_SEARCH_PATHS wirefish)
 
 qt_add_executable(wirefish
+    capture_reader.h
+    capture_reader.cpp
     main_window.h
     main_window.cpp
     mainwindow.ui

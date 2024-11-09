@@ -6,6 +6,7 @@
 
 constexpr size_t mac_address_length = 6;
 std::string parse_mac_address(const std::vector<uint8_t>& mac); // mac should be in network order
+std::string parse_mac_address(const u_char mac[ETHER_ADDR_LEN]);
 
 struct EthernetFrame {
 public:
